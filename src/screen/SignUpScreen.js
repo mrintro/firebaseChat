@@ -1,17 +1,17 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Alert, Button, Text, TextInput, View } from "react-native";
 import { auth, validateEmail, validatePassword } from "../utils/AuthenticationUtils"
 
-const LoginScreen = props => {
+const SignUpScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [handle, setHandle] = useState('');
 
-    const handleLogin = () => {
+    const handleSignUp = () => {
         if(validateEmail(email) && validatePassword(password)) {
-            signInWithEmailAndPassword(auth, email, password)
+            createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredentials) => {
-                    console.log('Signup success')
                     console.log(userCredentials)
                 })
                 .catch((error) => {
@@ -23,6 +23,12 @@ const LoginScreen = props => {
     return (
         <View>
             <Text>Login Screen</Text>
+            <TextInput
+                placeholder="handle"
+                keyboardType='default'
+                value={handle}
+                onChangeText={text => setHandle(text)}
+            />
             <TextInput
                 placeholder='Email'
                 keyboardType='email-address'
@@ -37,10 +43,9 @@ const LoginScreen = props => {
                 value={password}
                 onChangeText={text => setPassword(text)}
             />
-            <Button onPress={handleLogin} title='Login' />
-            <Button onPress={() => {props.navigation.navigate('AuthSignUp')}} title='SignUp' />
+            <Button onPress={handleSignUp} title='Register' />
         </View>
     )
 }
 
-export default LoginScreen;
+export default SignUpScreen;
