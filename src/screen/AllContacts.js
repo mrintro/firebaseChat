@@ -1,11 +1,15 @@
 import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ChatContext } from "../hooks/ChatContext";
 import { storeDB } from "../utils/AuthenticationUtils";
 import { AuthUserContext } from "../utils/AuthUserProvider";
 
-const ChannelItem = ({item}) => {
+const ChannelItem = ({props}) => {
     const {user, setUser} = useContext(AuthUserContext)
+    const { dispatch } = useContext(ChatContext)
+    const item = props.item
+
     const handleContactPress = async (item) => {
         const channelId = user.uid > item.uid 
             ? user.uid + item.uid
@@ -28,9 +32,9 @@ const ChannelItem = ({item}) => {
                 [channelId + ".date"] : serverTimestamp()
             })
         }
-        
+        dispatch({type: "SET_CHAT", payload: item});
+        props.props.navigation.navigate("ChatNav");
     }
-
 
     return (
         <TouchableOpacity 
@@ -44,7 +48,7 @@ const ChannelItem = ({item}) => {
 
 
 
-const AllContacts = () => {
+const AllContacts = props => {
 
     const [channels, setChannels] = useState([])
     const {user, setUser} = useContext(AuthUserContext)
@@ -64,7 +68,7 @@ const AllContacts = () => {
         <View>
             <FlatList
                 data={channels}
-                renderItem={({item}) => <ChannelItem item={item} />}
+                renderItem={({item}) => <ChannelItem props={{item, props}} />}
             />
         </View>);
 }

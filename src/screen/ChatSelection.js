@@ -63,9 +63,7 @@ const ChatSelection = props => {
     useEffect(() => {
         const unSub = onSnapshot(doc(storeDB, "userChats", user.uid), docSnapshot => {
             var channelVals = Object.entries(docSnapshot.data())
-            console.log(channelVals)
             channelVals.sort((a , b) => b[1].date - a[1].date)
-            console.log(channelVals)
             setChannels(channelVals)
         })
 

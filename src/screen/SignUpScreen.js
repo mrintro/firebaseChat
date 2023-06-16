@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { Alert, Button, Text, TextInput, View } from "react-native";
+import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { auth, storeDB, validateEmail, validatePassword } from "../utils/AuthenticationUtils"
 
 const SignUpScreen = () => {
@@ -37,14 +37,15 @@ const SignUpScreen = () => {
 
     return (
         <View>
-            <Text>Login Screen</Text>
             <TextInput
+                style = {styles.inputText}
                 placeholder="handle"
                 keyboardType='default'
                 value={handle}
                 onChangeText={text => setHandle(text)}
             />
             <TextInput
+                style = {styles.inputText}
                 placeholder='Email'
                 keyboardType='email-address'
                 textContentType='emailAddress'
@@ -52,6 +53,7 @@ const SignUpScreen = () => {
                 onChangeText={text => setEmail(text)}
             />
             <TextInput
+                style = {styles.inputText}
                 placeholder='Password'
                 textContentType='password'
                 secureTextEntry={true}
@@ -62,5 +64,33 @@ const SignUpScreen = () => {
         </View>
     )
 }
+
+
+const styles = StyleSheet.create({
+    item : {
+        height: "auto",
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderWidth: 1
+    },
+    textStyle : {
+        color: '#000',
+        fontSize: 20
+    },
+    messageText : {
+        color: '#000',
+        fontSize: 16
+    },
+    inputText: {
+        padding: 4,
+        fontSize: 16,
+        margin : 8,
+        borderWidth: 0.5
+    },
+    buttonStyle: {
+        marginBottom: 20
+    }
+})
+
 
 export default SignUpScreen;
