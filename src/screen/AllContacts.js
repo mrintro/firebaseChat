@@ -73,10 +73,10 @@ const AllContacts = () => {
 
 const styles = StyleSheet.create({
     item : {
-        backgroundColor: '#f9c2ff',
-        height: 40,
-        marginTop: 8,
-        marginBottom: 8
+        height: "auto",
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderWidth: 1
     },
     textStyle : {
         color: '#000',

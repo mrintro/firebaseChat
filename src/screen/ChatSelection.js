@@ -1,14 +1,35 @@
-import { collection, doc, DocumentSnapshot, getDoc, getDocs, onSnapshot } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
-import { storeDB } from "../utils/AuthenticationUtils";
+import { signOut } from "firebase/auth";
+import { collection, doc, DocumentSnapshot, getDoc, getDocs, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ChatContext } from "../hooks/ChatContext";
+import { auth, storeDB } from "../utils/AuthenticationUtils";
 import { AuthUserContext } from "../utils/AuthUserProvider";
 
-const ChannelItem = ({item}) => {
+const ChannelItem = ({props}) => {
+    const { user } = useContext(AuthUserContext)
+    const { dispatch } = useContext(ChatContext)
+
+    const handleOnpress = () => {
+        dispatch({type: "SET_CHAT", payload: props.item[1].userInfo});
+        props.props.navigation.navigate("ChatNav");
+    }
+    const lastMessage = () =>{ 
+        const textString = props.item[1].lastMessage ?
+        (props.item[1].lastMessage.senderId == user.uid ? "You : "
+            : `${props.item[1].userInfo.handle} : `) + props.item[1].lastMessage.text
+        : "" 
+        return textString;
+
+    }
     return (
-        <View style={styles.item}>
-            <Text style={styles.textStyle}>{item[1].userInfo.handle}</Text>
-        </View>
+        <TouchableOpacity 
+            style={styles.item}
+            onPress={() => handleOnpress()}
+        >
+            <Text style={styles.textStyle}>{props.item[1].userInfo.handle}</Text>
+            <Text style={styles.messageText}>{lastMessage()}</Text>
+        </TouchableOpacity>
     )
 }
 
@@ -21,10 +42,31 @@ const ChatSelection = props => {
         props.navigation.navigate('AllContacts')
     }
 
+    const handleSignOut = () => {
+        signOut(auth)
+    }
+
+    useLayoutEffect(()=> {
+        props.navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity 
+                    style = {{ marginRight: 10 }}
+                    onPress = {handleSignOut}
+                >
+                    <Text>Log Out</Text>
+                </TouchableOpacity>
+            )
+        })
+    })
+
 
     useEffect(() => {
         const unSub = onSnapshot(doc(storeDB, "userChats", user.uid), docSnapshot => {
-            setChannels(Object.entries(docSnapshot.data()))
+            var channelVals = Object.entries(docSnapshot.data())
+            console.log(channelVals)
+            channelVals.sort((a , b) => b[1].date - a[1].date)
+            console.log(channelVals)
+            setChannels(channelVals)
         })
 
         return () => unSub()
@@ -34,7 +76,7 @@ const ChatSelection = props => {
         <View>
             <FlatList 
                 data={channels}
-                renderItem={({item}) => <ChannelItem item={item} />}
+                renderItem={({item}) => <ChannelItem props={{item, props}} />}
             />
             <Button onPress={navigateToAllContacts} title="See all contacts"/>
         </View>
@@ -43,14 +85,18 @@ const ChatSelection = props => {
 
 const styles = StyleSheet.create({
     item : {
-        backgroundColor: '#f9c2ff',
-        height: 40,
-        marginTop: 8,
-        marginBottom: 8
+        height: "auto",
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderWidth: 1
     },
     textStyle : {
         color: '#000',
         fontSize: 20
+    },
+    messageText : {
+        color: '#000',
+        fontSize: 16
     }
 })
 
