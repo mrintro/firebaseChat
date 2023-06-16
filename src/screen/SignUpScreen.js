@@ -1,7 +1,8 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { Alert, Button, Text, TextInput, View } from "react-native";
-import { auth, validateEmail, validatePassword } from "../utils/AuthenticationUtils"
+import { auth, storeDB, validateEmail, validatePassword } from "../utils/AuthenticationUtils"
 
 const SignUpScreen = () => {
     const [email, setEmail] = useState('');
@@ -12,9 +13,23 @@ const SignUpScreen = () => {
         if(validateEmail(email) && validatePassword(password)) {
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredentials) => {
-                    console.log(userCredentials)
+                    updateProfile(userCredentials.user, {
+                        displayName: handle
+                    })
+                    setDoc(doc( storeDB, "users" , userCredentials.user.uid), {
+                        uid: userCredentials.user.uid,
+                        handle,
+                        email
+                    }).catch((error) => {
+                        console.log(`db error : ${error}`)
+                    })
+                    setDoc(doc( storeDB, "userChats" , userCredentials.user.uid), {})
+                    .catch((error) => {
+                        console.log(`db error : ${error}`)
+                    })
                 })
                 .catch((error) => {
+                    console.log(error)
                     alert(error.message)
                 })
         }

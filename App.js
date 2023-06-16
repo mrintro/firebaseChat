@@ -10,6 +10,7 @@ import {AuthUserContext, AuthUserProvider} from './src/utils/AuthUserProvider';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/utils/AuthenticationUtils';
 import { AuthStack, ChatStack } from './src/components/NavigationStack';
+import { ChatContext, ChatContextProvider } from './src/hooks/ChatContext';
 
 const Stack = createStackNavigator();
 
@@ -24,7 +25,8 @@ function RootNavigation() {
           auth,
           authUser => {
             console.log(authUser)
-            setUser(authUser)
+            if(authUser) setUser(authUser)
+            else setUser(null)
           }
       )
   }
@@ -45,7 +47,9 @@ function App() {
 
   return (
     <AuthUserProvider>
-      <RootNavigation />
+      <ChatContextProvider>
+        <RootNavigation />
+      </ChatContextProvider>
     </AuthUserProvider>
   );
 }

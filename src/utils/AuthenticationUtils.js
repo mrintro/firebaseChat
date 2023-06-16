@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { initializeFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useContext } from "react";
 import { AuthUserContext } from "./AuthUserProvider";
@@ -34,7 +34,7 @@ const onAuthStateChange = () => {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const storeDB = initializeFirestore(app, {experimentalForceLongPolling: true});
+const storeDB = getFirestore(app)
 
 export {
     validateEmail,
